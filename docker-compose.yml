@@ -1,0 +1,33 @@
+# Local development with hot reload
+# docker compose up --build
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    ports:
+      - "5173:5173"
+      - "3001:3001"
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src:ro
+      - ./index.html:/app/index.html:ro
+      - ./server:/app/server:ro
+      - ./vite.config.js:/app/vite.config.js:ro
+      - /app/node_modules
+    restart: unless-stopped
+    command: npx concurrently "npx vite --host 0.0.0.0" "node server/index.js"
+
+  # Production-like service (uncomment to test)
+  # prod:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3001:3001"
+  #   env_file:
+  #     - .env
+  #   restart: unless-stopped
